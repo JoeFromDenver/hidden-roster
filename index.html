@@ -1,278 +1,272 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>The Hidden Roster</title>
-    
+
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- React and ReactDOM -->
-    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    
-    <!-- Babel for JSX -->
+
+    <!-- Babel for JSX and ES Modules -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-
-    <!-- Prop Types (Required by Recharts) -->
-    <script src="https://unpkg.com/prop-types/prop-types.min.js"></script>
-
-    <!-- Recharts -->
-    <script src="https://unpkg.com/recharts/umd/Recharts.js"></script>
 </head>
+
 <body>
     <div id="root"></div>
 
-    <script type="text/babel">
-const { useState, useMemo } = React;
-const { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, Legend } = window.Recharts;
+    <script type="text/babel" data-type="module">
+        import React, { useState, useMemo } from 'https://esm.sh/react@18';
+        import { createRoot } from 'https://esm.sh/react-dom@18/client';
+        import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, Legend } from 'https://esm.sh/recharts@2.12.0?deps=react@18,react-dom@18';
 
-// Inline SVG components for Lucide icons
-const Users = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>;
-const Heart = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>;
-const EyeOff = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><line x1="2" x2="22" y1="2" y2="22"/></svg>;
-const Trophy = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>;
-const Info = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>;
+        // Inline SVG components for Lucide icons
+        const Users = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M22 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" /></svg>;
+        const Heart = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" /></svg>;
+        const EyeOff = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24" /><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68" /><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61" /><line x1="2" x2="22" y1="2" y2="22" /></svg>;
+        const Trophy = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6" /><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18" /><path d="M4 22h16" /><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22" /><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22" /><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z" /></svg>;
+        const Info = (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><circle cx="12" cy="12" r="10" /><path d="M12 16v-4" /><path d="M12 8h.01" /></svg>;
 
-// 2024-2025 NHL Player Demographics 
-const nhlDemographics = [
-  { name: 'Canada', players: 420, rateMultiplier: 1.0, flag: '🇨🇦', color: '#ef4444' }, // Montreal Red
-  { name: 'United States', players: 303, rateMultiplier: 1.1, flag: '🇺🇸', color: '#3b82f6' },
-  { name: 'Sweden', players: 97, rateMultiplier: 0.9, flag: '🇸🇪', color: '#eab308' }, // Boston Gold
-  { name: 'Russia', players: 65, rateMultiplier: 0.6, flag: '🇷🇺', color: '#1e293b' },
-  { name: 'Finland', players: 56, rateMultiplier: 0.9, flag: '🇫🇮', color: '#0ea5e9' },
-  { name: 'Czechia', players: 29, rateMultiplier: 0.8, flag: '🇨🇿', color: '#f97316' },
-  { name: 'Other', players: 52, rateMultiplier: 0.9, flag: '🌍', color: '#8b5cf6' },
-];
+        // 2024-2025 NHL Player Demographics 
+        const nhlDemographics = [
+            { name: 'Canada', players: 420, rateMultiplier: 1.0, flag: '🇨🇦', color: '#ef4444' }, // Montreal Red
+            { name: 'United States', players: 303, rateMultiplier: 1.1, flag: '🇺🇸', color: '#3b82f6' },
+            { name: 'Sweden', players: 97, rateMultiplier: 0.9, flag: '🇸🇪', color: '#eab308' }, // Boston Gold
+            { name: 'Russia', players: 65, rateMultiplier: 0.6, flag: '🇷🇺', color: '#1e293b' },
+            { name: 'Finland', players: 56, rateMultiplier: 0.9, flag: '🇫🇮', color: '#0ea5e9' },
+            { name: 'Czechia', players: 29, rateMultiplier: 0.8, flag: '🇨🇿', color: '#f97316' },
+            { name: 'Other', players: 52, rateMultiplier: 0.9, flag: '🌍', color: '#8b5cf6' },
+        ];
 
-function HeatedRivalryDashboard() {
-  const [baseRate, setBaseRate] = useState(4.0);
+        function HeatedRivalryDashboard() {
+            const [baseRate, setBaseRate] = useState(4.0);
 
-  const dashboardData = useMemo(() => {
-    let totalEstimated = 0;
-    const data = nhlDemographics.map(country => {
-      const specificRate = baseRate * country.rateMultiplier;
-      const estimatedPlayers = Math.round(country.players * (specificRate / 100));
-      totalEstimated += estimatedPlayers;
-      
-      return {
-        ...country,
-        specificRate: specificRate.toFixed(1),
-        estimatedPlayers,
-      };
-    });
-    
-    return { data, totalEstimated };
-  }, [baseRate]);
+            const dashboardData = useMemo(() => {
+                let totalEstimated = 0;
+                const data = nhlDemographics.map(country => {
+                    const specificRate = baseRate * country.rateMultiplier;
+                    const estimatedPlayers = Math.round(country.players * (specificRate / 100));
+                    totalEstimated += estimatedPlayers;
 
-  const totalPlayers = nhlDemographics.reduce((sum, c) => sum + c.players, 0);
+                    return {
+                        ...country,
+                        specificRate: specificRate.toFixed(1),
+                        estimatedPlayers,
+                    };
+                });
 
-  return (
-    <div className="min-h-screen bg-slate-950 text-slate-200 p-4 md:p-8 font-sans selection:bg-red-500/30">
-      
-      {/* Header Section */}
-      <header className="max-w-6xl mx-auto mb-10 text-center space-y-4">
-        <div className="inline-flex items-center justify-center p-3 bg-red-500/10 rounded-full mb-4 border border-red-500/20">
-          <Heart className="w-6 h-6 text-red-500 mr-2" fill="currentColor" />
-          <span className="text-red-400 font-semibold tracking-wider uppercase text-sm">The Heated Rivalry Project</span>
-          <Heart className="w-6 h-6 text-yellow-500 ml-2" fill="currentColor" />
-        </div>
-        <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight text-white">
-          The <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-yellow-500">Hidden Roster</span>
-        </h1>
-        <p className="text-lg md:text-xl text-slate-400 max-w-2xl mx-auto italic">
-          "He couldn't tell them that the right one had come along, and it was the pissed-off Russian man heading to the penalty box."
-        </p>
-        <p className="text-sm text-slate-500 max-w-3xl mx-auto mt-4">
-          In the world of professional hockey, Shane Hollander and Ilya Rozanov had to keep their relationship a secret. 
-          But mathematically? They aren't the only ones in the locker room.
-        </p>
-      </header>
+                return { data, totalEstimated };
+            }, [baseRate]);
 
-      {/* Main Content */}
-      <main className="max-w-6xl mx-auto space-y-8">
-        
-        {/* KPI Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl flex items-start space-x-4">
-            <div className="p-3 bg-blue-500/10 rounded-lg text-blue-400">
-              <Users className="w-8 h-8" />
-            </div>
-            <div>
-              <p className="text-slate-400 text-sm font-medium uppercase tracking-wider">Total Active NHL Players</p>
-              <h2 className="text-4xl font-bold text-white mt-1">{totalPlayers}</h2>
-              <p className="text-xs text-slate-500 mt-2">2024-2025 Season Roster Data</p>
-            </div>
-          </div>
+            const totalPlayers = nhlDemographics.reduce((sum, c) => sum + c.players, 0);
 
-          <div className="bg-slate-900 border border-red-900/50 rounded-2xl p-6 shadow-xl flex items-start space-x-4 relative overflow-hidden">
-            <div className="absolute -right-4 -top-4 opacity-5">
-              <EyeOff className="w-32 h-32" />
-            </div>
-            <div className="p-3 bg-red-500/10 rounded-lg text-red-500 z-10">
-              <EyeOff className="w-8 h-8" />
-            </div>
-            <div className="z-10">
-              <p className="text-red-400 text-sm font-medium uppercase tracking-wider">Estimated Gay/Bi Players</p>
-              <h2 className="text-4xl font-bold text-white mt-1">{dashboardData.totalEstimated}</h2>
-              <p className="text-xs text-slate-400 mt-2">The statistical "Hidden Roster"</p>
-            </div>
-          </div>
+            return (
+                <div className="min-h-screen bg-slate-950 text-slate-200 p-4 md:p-8 font-sans selection:bg-red-500/30">
 
-          <div className="bg-slate-900 border border-yellow-900/50 rounded-2xl p-6 shadow-xl flex items-start space-x-4">
-            <div className="p-3 bg-yellow-500/10 rounded-lg text-yellow-500">
-              <Trophy className="w-8 h-8" />
-            </div>
-            <div>
-              <p className="text-yellow-400 text-sm font-medium uppercase tracking-wider">Equivalent NHL Teams</p>
-              <h2 className="text-4xl font-bold text-white mt-1">
-                {(dashboardData.totalEstimated / 23).toFixed(1)}
-              </h2>
-              <p className="text-xs text-slate-400 mt-2">Based on a 23-man active roster</p>
-            </div>
-          </div>
-        </div>
+                    {/* Header Section */}
+                    <header className="max-w-6xl mx-auto mb-10 text-center space-y-4">
+                        <div className="inline-flex items-center justify-center p-3 bg-red-500/10 rounded-full mb-4 border border-red-500/20">
+                            <Heart className="w-6 h-6 text-red-500 mr-2" fill="currentColor" />
+                            <span className="text-red-400 font-semibold tracking-wider uppercase text-sm">The Heated Rivalry Project</span>
+                            <Heart className="w-6 h-6 text-yellow-500 ml-2" fill="currentColor" />
+                        </div>
+                        <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight text-white">
+                            The <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-yellow-500">Hidden Roster</span>
+                        </h1>
+                        <p className="text-lg md:text-xl text-slate-400 max-w-2xl mx-auto italic">
+                            "He couldn't tell them that the right one had come along, and it was the pissed-off Russian man heading to the penalty box."
+                        </p>
+                        <p className="text-sm text-slate-500 max-w-3xl mx-auto mt-4">
+                            In the world of professional hockey, Shane Hollander and Ilya Rozanov had to keep their relationship a secret.
+                            But mathematically? They aren't the only ones in the locker room.
+                        </p>
+                    </header>
 
-        {/* Interactive Controls & Chart */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          
-          {/* Left Column: Controls */}
-          <div className="space-y-6">
-            <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl">
-              <h3 className="text-lg font-bold text-white flex items-center mb-4">
-                <Info className="w-5 h-5 mr-2 text-slate-400" />
-                Adjust the Odds
-              </h3>
-              <p className="text-sm text-slate-400 mb-6">
-                Estimates for the global gay/bisexual male population vary from a conservative 2% up to 10% in younger demographics. Move the slider to see how the hidden roster changes.
-              </p>
-              
-              <div className="space-y-4">
-                <div className="flex justify-between items-center">
-                  <span className="text-sm font-medium text-slate-300">Baseline Gay/Bi Male %</span>
-                  <span className="text-xl font-bold text-white bg-slate-800 px-3 py-1 rounded-lg">
-                    {baseRate.toFixed(1)}%
-                  </span>
+                    {/* Main Content */}
+                    <main className="max-w-6xl mx-auto space-y-8">
+
+                        {/* KPI Cards */}
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl flex items-start space-x-4">
+                                <div className="p-3 bg-blue-500/10 rounded-lg text-blue-400">
+                                    <Users className="w-8 h-8" />
+                                </div>
+                                <div>
+                                    <p className="text-slate-400 text-sm font-medium uppercase tracking-wider">Total Active NHL Players</p>
+                                    <h2 className="text-4xl font-bold text-white mt-1">{totalPlayers}</h2>
+                                    <p className="text-xs text-slate-500 mt-2">2024-2025 Season Roster Data</p>
+                                </div>
+                            </div>
+
+                            <div className="bg-slate-900 border border-red-900/50 rounded-2xl p-6 shadow-xl flex items-start space-x-4 relative overflow-hidden">
+                                <div className="absolute -right-4 -top-4 opacity-5">
+                                    <EyeOff className="w-32 h-32" />
+                                </div>
+                                <div className="p-3 bg-red-500/10 rounded-lg text-red-500 z-10">
+                                    <EyeOff className="w-8 h-8" />
+                                </div>
+                                <div className="z-10">
+                                    <p className="text-red-400 text-sm font-medium uppercase tracking-wider">Estimated Gay/Bi Players</p>
+                                    <h2 className="text-4xl font-bold text-white mt-1">{dashboardData.totalEstimated}</h2>
+                                    <p className="text-xs text-slate-400 mt-2">The statistical "Hidden Roster"</p>
+                                </div>
+                            </div>
+
+                            <div className="bg-slate-900 border border-yellow-900/50 rounded-2xl p-6 shadow-xl flex items-start space-x-4">
+                                <div className="p-3 bg-yellow-500/10 rounded-lg text-yellow-500">
+                                    <Trophy className="w-8 h-8" />
+                                </div>
+                                <div>
+                                    <p className="text-yellow-400 text-sm font-medium uppercase tracking-wider">Equivalent NHL Teams</p>
+                                    <h2 className="text-4xl font-bold text-white mt-1">
+                                        {(dashboardData.totalEstimated / 23).toFixed(1)}
+                                    </h2>
+                                    <p className="text-xs text-slate-400 mt-2">Based on a 23-man active roster</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Interactive Controls & Chart */}
+                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+                            {/* Left Column: Controls */}
+                            <div className="space-y-6">
+                                <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl">
+                                    <h3 className="text-lg font-bold text-white flex items-center mb-4">
+                                        <Info className="w-5 h-5 mr-2 text-slate-400" />
+                                        Adjust the Odds
+                                    </h3>
+                                    <p className="text-sm text-slate-400 mb-6">
+                                        Estimates for the global gay/bisexual male population vary from a conservative 2% up to 10% in younger demographics. Move the slider to see how the hidden roster changes.
+                                    </p>
+
+                                    <div className="space-y-4">
+                                        <div className="flex justify-between items-center">
+                                            <span className="text-sm font-medium text-slate-300">Baseline Gay/Bi Male %</span>
+                                            <span className="text-xl font-bold text-white bg-slate-800 px-3 py-1 rounded-lg">
+                                                {baseRate.toFixed(1)}%
+                                            </span>
+                                        </div>
+                                        <input
+                                            type="range"
+                                            min="1.0"
+                                            max="10.0"
+                                            step="0.1"
+                                            value={baseRate}
+                                            onChange={(e) => setBaseRate(parseFloat(e.target.value))}
+                                            className="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-red-500"
+                                        />
+                                        <div className="flex justify-between text-xs text-slate-500">
+                                            <span>Conservative (1%)</span>
+                                            <span>Optimistic (10%)</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="bg-gradient-to-br from-red-900/20 to-yellow-900/20 border border-slate-800 rounded-2xl p-6 shadow-xl">
+                                    <h3 className="text-lg font-bold text-white mb-2">The "Roommate" Factor</h3>
+                                    <p className="text-sm text-slate-300 leading-relaxed">
+                                        If the NHL reflects real-world demographics, there are currently enough closeted players to fill
+                                        <strong className="text-white"> {Math.floor(dashboardData.totalEstimated / 23)} entire teams</strong>.
+                                        Next time you watch a game, remember: the odds of two rivals having a secret post-game meetup in a hotel room aren't zero.
+                                    </p>
+                                </div>
+                            </div>
+
+                            {/* Right Column: Chart */}
+                            <div className="lg:col-span-2 bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl">
+                                <h3 className="text-lg font-bold text-white mb-6">Estimated Closeted Players by Nationality</h3>
+                                <div className="h-80 w-full">
+                                    <ResponsiveContainer width="100%" height="100%">
+                                        <BarChart data={dashboardData.data} margin={{ top: 20, right: 30, left: 0, bottom: 5 }}>
+                                            <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
+                                            <XAxis
+                                                dataKey="name"
+                                                stroke="#64748b"
+                                                tick={{ fill: '#94a3b8', fontSize: 12 }}
+                                                axisLine={false}
+                                                tickLine={false}
+                                            />
+                                            <YAxis
+                                                stroke="#64748b"
+                                                tick={{ fill: '#94a3b8', fontSize: 12 }}
+                                                axisLine={false}
+                                                tickLine={false}
+                                            />
+                                            <Tooltip
+                                                cursor={{ fill: '#1e293b' }}
+                                                contentStyle={{ backgroundColor: '#0f172a', borderColor: '#334155', borderRadius: '8px', color: '#f8fafc' }}
+                                                itemStyle={{ color: '#f8fafc' }}
+                                                formatter={(value, name) => [value, 'Estimated Players']}
+                                                labelFormatter={(label) => `${label} Nationality`}
+                                            />
+                                            <Bar
+                                                dataKey="estimatedPlayers"
+                                                radius={[4, 4, 0, 0]}
+                                                animationDuration={1000}
+                                            >
+                                                {dashboardData.data.map((entry, index) => (
+                                                    <Cell key={`cell-${index}`} fill={entry.color} />
+                                                ))}
+                                            </Bar>
+                                        </BarChart>
+                                    </ResponsiveContainer>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Data Table */}
+                        <div className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-xl mt-8">
+                            <div className="overflow-x-auto">
+                                <table className="w-full text-left border-collapse">
+                                    <thead>
+                                        <tr className="bg-slate-950/50 text-slate-400 text-sm uppercase tracking-wider border-b border-slate-800">
+                                            <th className="p-4 font-medium">Country</th>
+                                            <th className="p-4 font-medium text-right">Total NHL Players</th>
+                                            <th className="p-4 font-medium text-right">Est. Demographics</th>
+                                            <th className="p-4 font-medium text-right text-red-400">Hidden Roster Count</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-slate-800/50">
+                                        {dashboardData.data.map((country, idx) => (
+                                            <tr key={idx} className="hover:bg-slate-800/20 transition-colors">
+                                                <td className="p-4 flex items-center space-x-3">
+                                                    <span className="text-2xl">{country.flag}</span>
+                                                    <span className="font-medium text-slate-200">{country.name}</span>
+                                                </td>
+                                                <td className="p-4 text-right text-slate-300 font-mono">
+                                                    {country.players}
+                                                </td>
+                                                <td className="p-4 text-right text-slate-400 text-sm">
+                                                    ~{country.specificRate}%
+                                                </td>
+                                                <td className="p-4 text-right font-bold text-white text-lg">
+                                                    {country.estimatedPlayers}
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                    <tfoot className="bg-slate-950/80 border-t border-slate-700">
+                                        <tr>
+                                            <td className="p-4 font-bold text-white">League Totals</td>
+                                            <td className="p-4 text-right font-bold text-slate-300">{totalPlayers}</td>
+                                            <td className="p-4 text-right text-slate-500 text-sm">Avg ~{baseRate.toFixed(1)}%</td>
+                                            <td className="p-4 text-right font-bold text-red-400 text-xl">{dashboardData.totalEstimated}</td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+
+                    </main>
                 </div>
-                <input 
-                  type="range" 
-                  min="1.0" 
-                  max="10.0" 
-                  step="0.1" 
-                  value={baseRate}
-                  onChange={(e) => setBaseRate(parseFloat(e.target.value))}
-                  className="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-red-500"
-                />
-                <div className="flex justify-between text-xs text-slate-500">
-                  <span>Conservative (1%)</span>
-                  <span>Optimistic (10%)</span>
-                </div>
-              </div>
-            </div>
+            );
+        }
 
-            <div className="bg-gradient-to-br from-red-900/20 to-yellow-900/20 border border-slate-800 rounded-2xl p-6 shadow-xl">
-              <h3 className="text-lg font-bold text-white mb-2">The "Roommate" Factor</h3>
-              <p className="text-sm text-slate-300 leading-relaxed">
-                If the NHL reflects real-world demographics, there are currently enough closeted players to fill 
-                <strong className="text-white"> {Math.floor(dashboardData.totalEstimated / 23)} entire teams</strong>. 
-                Next time you watch a game, remember: the odds of two rivals having a secret post-game meetup in a hotel room aren't zero.
-              </p>
-            </div>
-          </div>
-
-          {/* Right Column: Chart */}
-          <div className="lg:col-span-2 bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl">
-            <h3 className="text-lg font-bold text-white mb-6">Estimated Closeted Players by Nationality</h3>
-            <div className="h-80 w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={dashboardData.data} margin={{ top: 20, right: 30, left: 0, bottom: 5 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
-                  <XAxis 
-                    dataKey="name" 
-                    stroke="#64748b" 
-                    tick={{fill: '#94a3b8', fontSize: 12}} 
-                    axisLine={false}
-                    tickLine={false}
-                  />
-                  <YAxis 
-                    stroke="#64748b" 
-                    tick={{fill: '#94a3b8', fontSize: 12}}
-                    axisLine={false}
-                    tickLine={false}
-                  />
-                  <Tooltip 
-                    cursor={{fill: '#1e293b'}}
-                    contentStyle={{ backgroundColor: '#0f172a', borderColor: '#334155', borderRadius: '8px', color: '#f8fafc' }}
-                    itemStyle={{ color: '#f8fafc' }}
-                    formatter={(value, name) => [value, 'Estimated Players']}
-                    labelFormatter={(label) => `${label} Nationality`}
-                  />
-                  <Bar 
-                    dataKey="estimatedPlayers" 
-                    radius={[4, 4, 0, 0]}
-                    animationDuration={1000}
-                  >
-                    {dashboardData.data.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
-        </div>
-
-        {/* Data Table */}
-        <div className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-xl mt-8">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="bg-slate-950/50 text-slate-400 text-sm uppercase tracking-wider border-b border-slate-800">
-                  <th className="p-4 font-medium">Country</th>
-                  <th className="p-4 font-medium text-right">Total NHL Players</th>
-                  <th className="p-4 font-medium text-right">Est. Demographics</th>
-                  <th className="p-4 font-medium text-right text-red-400">Hidden Roster Count</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-800/50">
-                {dashboardData.data.map((country, idx) => (
-                  <tr key={idx} className="hover:bg-slate-800/20 transition-colors">
-                    <td className="p-4 flex items-center space-x-3">
-                      <span className="text-2xl">{country.flag}</span>
-                      <span className="font-medium text-slate-200">{country.name}</span>
-                    </td>
-                    <td className="p-4 text-right text-slate-300 font-mono">
-                      {country.players}
-                    </td>
-                    <td className="p-4 text-right text-slate-400 text-sm">
-                      ~{country.specificRate}%
-                    </td>
-                    <td className="p-4 text-right font-bold text-white text-lg">
-                      {country.estimatedPlayers}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-              <tfoot className="bg-slate-950/80 border-t border-slate-700">
-                <tr>
-                  <td className="p-4 font-bold text-white">League Totals</td>
-                  <td className="p-4 text-right font-bold text-slate-300">{totalPlayers}</td>
-                  <td className="p-4 text-right text-slate-500 text-sm">Avg ~{baseRate.toFixed(1)}%</td>
-                  <td className="p-4 text-right font-bold text-red-400 text-xl">{dashboardData.totalEstimated}</td>
-                </tr>
-              </tfoot>
-            </table>
-          </div>
-        </div>
-
-      </main>
-    </div>
-  );
-}
-
-const root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(<HeatedRivalryDashboard />);
+        const root = createRoot(document.getElementById('root'));
+        root.render(<HeatedRivalryDashboard />);
     </script>
 </body>
+
 </html>
